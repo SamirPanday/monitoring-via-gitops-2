@@ -1,7 +1,7 @@
 # Environment-specific settings of the target cluster. The monitoring namespace is fixed to "monitoring".
 
 networkPolicies:
-  enabled: true
+  enabled: false
   # Namespace of the ingress gateway pods that forward traffic to Grafana.
   gatewayNamespace: istio-ingress
 
@@ -21,21 +21,21 @@ serviceMonitors:
 
 # Exposes Grafana through an existing Istio ingress gateway. Set enabled=false to use port-forward instead.
 exposure:
-  enabled: true
+  enabled: false
   host: grafana.poc.local
   service:
     name: grafana
     port: 80
   gateway:
     # true: create a Gateway that serves the host. false: attach to an existing Gateway <namespace>/<name>.
-    create: true
+    create: false
     namespace: istio-ingress
     name: main-gateway
     selector:
       istio: ingressgateway
   tls:
     # Issues a certificate with cert-manager into the gateway namespace (secret must exist there when create=true).
-    enabled: true
+    enabled: false
     issuerKind: ClusterIssuer
     issuerName: poc-ca
     secretName: grafana-tls
