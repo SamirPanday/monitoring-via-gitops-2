@@ -1,0 +1,15 @@
+tenant: acme
+
+namespaces:
+  - acme
+
+# Create the namespace if it does not already exist.
+manageNamespace: true
+
+networkPolicy:
+  enabled: false
+
+members:
+  - login: acme-user
+    email: acme-user@example.com
+    password: acme-user
