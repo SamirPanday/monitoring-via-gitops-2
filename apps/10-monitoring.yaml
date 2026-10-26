@@ -126,22 +126,22 @@ spec:
     retry: { limit: 10, backoff: { duration: 15s, factor: 2, maxDuration: 5m } }
 ---
 # Wave 4: tenant onboarding ApplicationSet (one Application per tenants/<name>)
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: tenancy
-  namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "4"
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/SamirPanday/monitoring-via-gitops-2.git
-    targetRevision: main
-    path: appsets
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: argocd
-  syncPolicy:
-    automated: { prune: true, selfHeal: true }
-    syncOptions: [ServerSideApply=true]
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: tenancy
+#   namespace: argocd
+#   annotations:
+#     argocd.argoproj.io/sync-wave: "4"
+# spec:
+#   project: default
+#   source:
+#     repoURL: https://github.com/SamirPanday/monitoring-via-gitops-2.git
+#     targetRevision: main
+#     path: appsets
+#   destination:
+#     server: https://kubernetes.default.svc
+#     namespace: argocd
+#   syncPolicy:
+#     automated: { prune: true, selfHeal: true }
+#     syncOptions: [ServerSideApply=true]
