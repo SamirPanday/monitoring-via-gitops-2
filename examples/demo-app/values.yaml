@@ -1,0 +1,12 @@
+# Overridden by tenants/<name>/values.yaml.
+tenant: ""
+images:
+  nginx: nginxinc/nginx-unprivileged:1.31.7-alpine
+  exporter: nginx/nginx-prometheus-exporter:1.5.3
+  curl: curlimages/curl:8.23.0
+trafficIntervalSeconds: 2
+traffic:
+  # One error (500) / one throttled (503) / one slow request every N requests.
+  errorEvery: 5
+  unavailableEvery: 9
+  slowEvery: 6

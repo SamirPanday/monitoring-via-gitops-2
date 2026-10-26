@@ -1,0 +1,9 @@
+# The namespace name is fixed to "monitoring" because service URLs across the stack refer to it.
+namespace:
+  # node-exporter needs host access, so the namespace cannot enforce "restricted".
+  podSecurity: privileged
+
+# RKE2 with a CIS profile only allows same-namespace traffic in kube-system; this lets Prometheus scrape CoreDNS.
+# Set to false on clusters without that policy.
+rke2Cis:
+  allowCorednsScrape: true

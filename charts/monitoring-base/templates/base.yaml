@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+  labels:
+    pod-security.kubernetes.io/enforce: {{ .Values.namespace.podSecurity }}
+---
+# CIS 5.1.5: default service accounts must not mount API tokens.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: default
+  namespace: monitoring
+automountServiceAccountToken: false
+{{- if .Values.rke2Cis.allowCorednsScrape }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring-scrape
+  namespace: kube-system
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: monitoring
+      ports:
+        - port: 9153
+{{- end }}

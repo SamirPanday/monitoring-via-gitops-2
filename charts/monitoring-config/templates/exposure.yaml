@@ -1,0 +1,68 @@
+{{- with .Values.exposure }}
+{{- if .enabled }}
+{{- if and .tls.enabled .gateway.create }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .tls.secretName }}
+  namespace: {{ .gateway.namespace }}
+spec:
+  secretName: {{ .tls.secretName }}
+  duration: 8760h
+  dnsNames:
+    - {{ .host }}
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: {{ .tls.issuerName }}
+    kind: {{ .tls.issuerKind }}
+---
+{{- end }}
+{{- if .gateway.create }}
+apiVersion: networking.istio.io/v1
+kind: Gateway
+metadata:
+  name: {{ .gateway.name }}
+  namespace: {{ .gateway.namespace }}
+spec:
+  selector:
+    {{- toYaml .gateway.selector | nindent 4 }}
+  servers:
+    - port:
+        number: 443
+        name: https
+        protocol: HTTPS
+      hosts:
+        - {{ .host }}
+      tls:
+        mode: SIMPLE
+        credentialName: {{ .tls.secretName }}
+    - port:
+        number: 80
+        name: http
+        protocol: HTTP
+      hosts:
+        - {{ .host }}
+      tls:
+        httpsRedirect: true
+---
+{{- end }}
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: grafana
+  namespace: {{ .gateway.namespace }}
+spec:
+  hosts:
+    - {{ .host }}
+  gateways:
+    - {{ .gateway.namespace }}/{{ .gateway.name }}
+  http:
+    - route:
+        - destination:
+            host: {{ .service.name }}.monitoring.svc.cluster.local
+            port:
+              number: {{ .service.port }}
+{{- end }}
+{{- end }}

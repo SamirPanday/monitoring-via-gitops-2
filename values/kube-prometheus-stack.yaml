@@ -1,0 +1,187 @@
+# Environment settings to review: storageClassName (3 places, default longhorn), grafana.adminPassword,
+# grafana.grafana.ini server.domain/root_url (must match charts/monitoring-config exposure.host).
+fullnameOverride: kps
+
+defaultRules:
+  create: true
+
+alertmanager:
+  alertmanagerSpec:
+    # Selects tenant AlertmanagerConfig objects; the operator forces a namespace matcher on each.
+    alertmanagerConfigSelector: {}
+    alertmanagerConfigNamespaceSelector: {}
+    alertmanagerConfigMatcherStrategy:
+      type: OnNamespace
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes: [ReadWriteOnce]
+          resources:
+            requests:
+              storage: 2Gi
+
+prometheus:
+  prometheusSpec:
+    retention: 7d
+    retentionSize: 12GB
+    scrapeInterval: 30s
+    evaluationInterval: 30s
+    # Select ServiceMonitors, PodMonitors, rules and probes from every namespace.
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    ruleSelectorNilUsesHelmValues: false
+    probeSelectorNilUsesHelmValues: false
+    resources:
+      requests:
+        cpu: 200m
+        memory: 1Gi
+      limits:
+        memory: 2Gi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes: [ReadWriteOnce]
+          resources:
+            requests:
+              storage: 15Gi
+
+prometheusOperator:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+# RKE2 control-plane components run as static pods labelled component=<name>.
+kubeEtcd:
+  enabled: true
+  service:
+    enabled: true
+    port: 2381
+    targetPort: 2381
+    selector:
+      component: etcd
+  serviceMonitor:
+    scheme: http
+
+kubeControllerManager:
+  enabled: true
+  service:
+    enabled: true
+    port: 10257
+    targetPort: 10257
+    selector:
+      component: kube-controller-manager
+  serviceMonitor:
+    https: true
+    insecureSkipVerify: true
+
+kubeScheduler:
+  enabled: true
+  service:
+    enabled: true
+    port: 10259
+    targetPort: 10259
+    selector:
+      component: kube-scheduler
+  serviceMonitor:
+    https: true
+    insecureSkipVerify: true
+
+kubeProxy:
+  enabled: true
+  service:
+    enabled: true
+    port: 10249
+    targetPort: 10249
+    selector:
+      component: kube-proxy
+
+kubeDns:
+  enabled: false
+coreDns:
+  enabled: true
+
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 64Mi
+
+# Control-plane nodes are tainted CriticalAddonsOnly; run on them too to cover their host metrics.
+prometheus-node-exporter:
+  tolerations:
+    - operator: Exists
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+
+grafana:
+  enabled: true
+  fullnameOverride: grafana
+  # PoC credentials; rotate before any real use.
+  adminUser: admin
+  adminPassword: Adm1n-Poc-2026
+  deploymentStrategy:
+    type: Recreate
+  persistence:
+    enabled: true
+    type: pvc
+    storageClassName: longhorn
+    accessModes: [ReadWriteOnce]
+    size: 2Gi
+  resources:
+    requests:
+      cpu: 50m
+      memory: 192Mi
+  grafana.ini:
+    server:
+      domain: grafana.poc.local
+      root_url: https://grafana.poc.local
+    users:
+      allow_sign_up: false
+      allow_org_create: false
+      # Single shared org: new members join org 1 as Viewer; the reconciler sets their real role.
+      auto_assign_org: true
+      auto_assign_org_id: 1
+      auto_assign_org_role: Viewer
+    auth.anonymous:
+      enabled: false
+    analytics:
+      reporting_enabled: false
+      check_for_updates: false
+    # Viewers could otherwise browse every namespace's alerts; tenant alerting goes through Alertmanager instead.
+    unified_alerting:
+      enabled: false
+    alerting:
+      enabled: false
+  # One shared Loki datasource (uid "loki"); the dashboards fix the namespaces in their queries.
+  additionalDataSources:
+    - name: Loki
+      uid: loki
+      type: loki
+      access: proxy
+      url: http://loki.monitoring.svc.cluster.local:3100
+  sidecar:
+    dashboards:
+      enabled: true
+      searchNamespace: ALL
+      label: grafana_dashboard
+      # Infrastructure dashboards go to a folder that the reconciler restricts to org admins.
+      annotations:
+        grafana_folder: Platform (admins only)
+      folderAnnotation: grafana_folder
+      provider:
+        foldersFromFilesStructure: true
+    datasources:
+      enabled: true
+      defaultDatasourceEnabled: true
+      isDefaultDatasource: true
+      alertmanager:
+        enabled: false

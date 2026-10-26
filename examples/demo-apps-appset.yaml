@@ -1,0 +1,37 @@
+# Optional: deploys the sample nginx workload into each tenant namespace. The directory name must equal the namespace.
+# Only for trying the stack out; copy examples/tenants/* into tenants/ and apply this file once.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: demo-apps
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/CHANGE_ME/monitoring-only.git
+        revision: main
+        directories:
+          - path: tenants/*
+          - path: tenants/_template
+            exclude: true
+  template:
+    metadata:
+      name: 'demo-{{.path.basename}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/CHANGE_ME/monitoring-only.git
+        targetRevision: main
+        path: examples/demo-app
+        helm:
+          valueFiles:
+            - '../../{{.path.path}}/values.yaml'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{.path.basename}}'
+      syncPolicy:
+        automated: { prune: true, selfHeal: true }
+        syncOptions: [ServerSideApply=true, SkipDryRunOnMissingResource=true]
+        retry: { limit: 15, backoff: { duration: 20s, factor: 2, maxDuration: 5m } }

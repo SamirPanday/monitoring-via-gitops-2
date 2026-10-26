@@ -1,0 +1,14 @@
+# Sample tenant with a demo workload. Copy this directory to tenants/tenant-b to deploy it.
+tenant: tenant-b
+namespaces: [tenant-b]
+manageNamespace: true
+networkPolicy:
+  enabled: true
+members:
+  - login: tenant-b
+    email: tenant-b@poc.local
+    password: TenantB-Poc-2026
+# Synthetic load of the demo app (noisier than tenant-a).
+traffic:
+  errorEvery: 3
+  slowEvery: 4

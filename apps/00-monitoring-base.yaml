@@ -1,0 +1,19 @@
+# Wave -1: the monitoring namespace (PSA privileged for node-exporter), default service account and RKE2 CIS scrape policy.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring-base
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/CHANGE_ME/monitoring-only.git
+    targetRevision: main
+    path: charts/monitoring-base
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [ServerSideApply=true]

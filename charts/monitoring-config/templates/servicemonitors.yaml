@@ -1,0 +1,54 @@
+{{- with .Values.serviceMonitors.longhorn }}
+{{- if .enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: longhorn
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames: [{{ .namespace }}]
+  selector:
+    matchLabels:
+      app: longhorn-manager
+  endpoints:
+    - port: manager
+{{- end }}
+{{- end }}
+{{- with .Values.serviceMonitors.istiod }}
+{{- if .enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: istiod
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames: [{{ .namespace }}]
+  selector:
+    matchLabels:
+      app: istiod
+  endpoints:
+    - port: http-monitoring
+{{- end }}
+{{- end }}
+{{- with .Values.serviceMonitors.ingressGateway }}
+{{- if .enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: istio-ingressgateway
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames: [{{ .namespace }}]
+  selector:
+    matchLabels:
+      {{- toYaml .selector | nindent 6 }}
+  podMetricsEndpoints:
+    - portNumber: 15090
+      path: /stats/prometheus
+{{- end }}
+{{- end }}

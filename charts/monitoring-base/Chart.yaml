@@ -1,0 +1,6 @@
+apiVersion: v2
+name: monitoring-base
+description: "Namespace, default service account and RKE2 CIS network policy that the monitoring stack needs before it is installed"
+type: application
+version: 0.1.0
+appVersion: "1.0"

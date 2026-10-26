@@ -1,0 +1,6 @@
+apiVersion: v2
+name: monitoring-config
+description: "Network policies, ServiceMonitors and Grafana exposure (Istio gateway, TLS) for the monitoring stack"
+type: application
+version: 0.1.0
+appVersion: "1.0"

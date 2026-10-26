@@ -1,0 +1,37 @@
+# One Application per tenants/<name> directory (except _template): alerting, optional namespace/network policy
+# and the Grafana members, folder, dashboards and datasource for that tenant.
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: tenants
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/CHANGE_ME/monitoring-only.git
+        revision: main
+        directories:
+          - path: tenants/*
+          - path: tenants/_template
+            exclude: true
+  template:
+    metadata:
+      name: 'onboard-{{.path.basename}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/CHANGE_ME/monitoring-only.git
+        targetRevision: main
+        path: charts/tenant
+        helm:
+          valueFiles:
+            - '../../{{.path.path}}/values.yaml'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: monitoring
+      syncPolicy:
+        automated: { prune: true, selfHeal: true }
+        syncOptions: [ServerSideApply=true, SkipDryRunOnMissingResource=true]
+        retry: { limit: 10, backoff: { duration: 15s, factor: 2, maxDuration: 5m } }

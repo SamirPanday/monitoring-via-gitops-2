@@ -1,0 +1,25 @@
+# Copy this directory to tenants/<name> and edit it; the directory name becomes the tenant's Application name.
+# Everything here is read by charts/tenant (see its values.yaml for all options).
+
+# Display name of the tenant: used for its Grafana team, folder and Loki datasource.
+tenant: my-tenant
+
+# The namespaces whose logs and metrics the tenant sees. One tenant may span several namespaces (applications in
+# different namespaces); its dashboards are hard-wired to this list and get a namespace filter when there are several.
+namespaces:
+  - my-namespace
+
+# Leave false when the namespaces already exist. true makes the chart create them (PSA restricted).
+manageNamespace: false
+
+# Default-deny ingress for each namespace (allows same-namespace traffic and Prometheus scraping only).
+# Keep false for namespaces whose workloads receive traffic from outside the namespace.
+networkPolicy:
+  enabled: false
+
+# Grafana members: always read-only Viewers who only see this tenant's folder.
+# Add a login to give someone access; remove it to revoke (the account is deleted). Plaintext passwords.
+members:
+  - login: my-tenant
+    email: my-tenant@example.com
+    password: CHANGE_ME

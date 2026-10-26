@@ -1,0 +1,20 @@
+# Sample tenant with a demo workload. Copy this directory to tenants/tenant-a to deploy it.
+tenant: tenant-a
+namespaces: [tenant-a]
+# The sample namespace does not exist yet, so let the chart create it and lock it down.
+manageNamespace: true
+networkPolicy:
+  enabled: true
+# Grafana members: read-only Viewers who only see this tenant's folder.
+# Add a login to give someone access; remove it to revoke (the account is deleted). PoC passwords in plaintext.
+members:
+  - login: tenant-a
+    email: tenant-a@poc.local
+    password: TenantA-Poc-2026
+  - login: tenant-a-viewer2
+    email: tenant-a-viewer2@poc.local
+    password: TenantA-Viewer2-2026
+# Synthetic load of the demo app: one error / one slow request every N requests.
+traffic:
+  errorEvery: 5
+  slowEvery: 6
