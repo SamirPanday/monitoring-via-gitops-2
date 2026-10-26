@@ -9,7 +9,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/CHANGE_ME/monitoring-only.git
+    repoURL: https://github.com/SamirPanday/monitoring-via-gitops-2.git
     targetRevision: main
     path: charts/monitoring-base
   destination:

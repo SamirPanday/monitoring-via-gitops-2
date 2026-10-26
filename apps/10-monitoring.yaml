@@ -14,7 +14,7 @@ spec:
       targetRevision: 92.11.0
       helm:
         valueFiles: [$values/values/kube-prometheus-stack.yaml]
-    - repoURL: https://github.com/CHANGE_ME/monitoring-only.git
+    - repoURL: https://github.com/SamirPanday/monitoring-via-gitops-2.git
       targetRevision: main
       ref: values
   destination:
@@ -42,7 +42,7 @@ spec:
       helm:
         releaseName: loki
         valueFiles: [$values/values/loki.yaml]
-    - repoURL: https://github.com/CHANGE_ME/monitoring-only.git
+    - repoURL: https://github.com/SamirPanday/monitoring-via-gitops-2.git
       targetRevision: main
       ref: values
   destination:
@@ -70,7 +70,7 @@ spec:
       helm:
         releaseName: alloy
         valueFiles: [$values/values/alloy.yaml]
-    - repoURL: https://github.com/CHANGE_ME/monitoring-only.git
+    - repoURL: https://github.com/SamirPanday/monitoring-via-gitops-2.git
       targetRevision: main
       ref: values
   destination:
@@ -92,7 +92,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/CHANGE_ME/monitoring-only.git
+    repoURL: https://github.com/SamirPanday/monitoring-via-gitops-2.git
     targetRevision: main
     path: charts/monitoring-config
   destination:
@@ -114,7 +114,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/CHANGE_ME/monitoring-only.git
+    repoURL: https://github.com/SamirPanday/monitoring-via-gitops-2.git
     targetRevision: main
     path: charts/reconciler
   destination:
@@ -136,7 +136,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/CHANGE_ME/monitoring-only.git
+    repoURL: https://github.com/SamirPanday/monitoring-via-gitops-2.git
     targetRevision: main
     path: appsets
   destination:
