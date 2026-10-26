@@ -125,6 +125,8 @@ prometheus-node-exporter:
 grafana:
   enabled: true
   fullnameOverride: grafana
+  service:
+    type: NodePort
   # PoC credentials; rotate before any real use.
   adminUser: admin
   adminPassword: Adm1n-Poc-2026
