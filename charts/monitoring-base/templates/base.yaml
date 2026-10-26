@@ -11,22 +11,22 @@ kind: ServiceAccount
 metadata:
   name: default
   namespace: monitoring
-automountServiceAccountToken: false
-{{- if .Values.rke2Cis.allowCorednsScrape }}
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-monitoring-scrape
-  namespace: kube-system
-spec:
-  podSelector: {}
-  policyTypes: [Ingress]
-  ingress:
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: monitoring
-      ports:
-        - port: 9153
-{{- end }}
+automountServiceAccountToken: true
+# {{- if .Values.rke2Cis.allowCorednsScrape }}
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: allow-monitoring-scrape
+#   namespace: kube-system
+# spec:
+#   podSelector: {}
+#   policyTypes: [Ingress]
+#   ingress:
+#     - from:
+#         - namespaceSelector:
+#             matchLabels:
+#               kubernetes.io/metadata.name: monitoring
+#       ports:
+#         - port: 9153
+# {{- end }}
